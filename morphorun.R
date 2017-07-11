@@ -16,7 +16,7 @@ load("~/Dropbox/Pedigree and Life-History Data/pedigreeKW2016.RData")
 A <- 2*kinship2::kinship(bigped$id,dadid=bigped$sire,momid=bigped$dam)
 A <- A[match(morphdat$ID,rownames(A)),match(morphdat$ID,rownames(A))]
 standat$L_A <- t(chol(A))
-stanfit <- sampling(mvlmm,data=standat,chains=2,iter=500,warmup=250,
+stanfit <- sampling(mvlmm,data=standat,chains=,iter=500,warmup=250,
                     pars=c("alpha","beta","sigma_eps","sigma_u","sigma_g","rho_eps","rho_u","rho_g","h2"))
 
 geno <- "snp"
@@ -40,3 +40,8 @@ A <- A[match(morphdat$ID,rownames(A)),match(morphdat$ID,rownames(A))]
 standat$L_A <- t(chol(A))
 stanfit_A <- sampling(mvlmm,data=standat,chains=4,iter=2000,warmup=500,
                       pars=c("alpha","beta","sigma_eps","sigma_u","sigma_g","rho_eps","rho_u","rho_g"))
+
+
+guh <- stan_hist(stanfit,pars="h2")$data
+names(guh)[1] <- "heritability"
+ggplot(guh,aes(x=heritability)) + geom_density() + facet_wrap(~parameter,scale="free") + geom_vline(xintercept=0,size=0) 
